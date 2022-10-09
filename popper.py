@@ -76,7 +76,7 @@ class POP3:
 			pass
 
 		except Exception as e:
-			sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+			error(e)
 			return False
 			self.io.close()
 			exit()
@@ -102,7 +102,7 @@ class POP3:
 						print("exit\t\t Exits this server.\n")
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				if cmd[0:2] == "ls":
 					try:
@@ -111,7 +111,7 @@ class POP3:
 						s = msg.replace("\r", "")
 						print(s)
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				elif cmd[0:3] == "cat":
 					try:
@@ -132,7 +132,7 @@ class POP3:
 								break
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 				
 				elif cmd[0:2] == "rm":
 					try:
@@ -142,7 +142,7 @@ class POP3:
 						print("Message deleted.")
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				elif cmd[0:5] == "reset":
 					try:
@@ -151,11 +151,11 @@ class POP3:
 						print("Done.")
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				elif cmd[0:2] == "sh":
 					if len(cmd) <= 3:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: Command not found.\n")
+						error("Command not found.")
 
 					else:
 						try:
@@ -163,7 +163,7 @@ class POP3:
 							print(out)
 
 						except Exception as e:
-							sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+							error(e)
 
 				elif cmd[0:5] == "clear":
 					try:
@@ -171,7 +171,7 @@ class POP3:
 						print(out)
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				elif cmd[0:6] == "whoami":
 					print(self.user, end="")
@@ -181,26 +181,30 @@ class POP3:
 						io.sendline(b"QUIT")
 						out = io.recvline().replace(b"\r", b"")
 						print(out.decode())
+						sys.exit()
 
 					except Exception as e:
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: {e}\n")
+						error(e)
 
 				else:
 					if not cmd[0:4].encode() == b'help':
-						sys.stderr.write(f"[{termcolor.colored('!', 'red')}] Exception: Command not found. Type help for HELP.\n")
+						error("Command not found. Type help for HELP.")
 
 			except KeyboardInterrupt:
 				self.io.close()
-				exit()
+				sys.exit()
 
 			except EOFError:
 				break
 				sys.exit()
+
+def error(s):
+	sys.stderr.write("[%s] Exception: %s\n" % (termcolor.colored('!', 'red'), s))
 
 if __name__ == '__main__':
 	try:
 		POP3()
 
 	except (KeyboardInterrupt, EOFError):
-		sys.stderr.write(f"[{termcolor.colored('-', 'red')}] Terminating...\n")
+		error("Terminating...")
 		exit()
