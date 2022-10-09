@@ -2,8 +2,9 @@
 
 import os
 import sys
-import argparse
 import getpass
+import socket
+import argparse
 import termcolor
 import subprocess
 
@@ -37,7 +38,7 @@ class POP3:
 
 	def connect(self):
 		try:
-			self.io = remote(self.args.host, self.args.port)
+			self.io = remote(socket.gethostbyname(self.args.host), self.args.port)
 			self.io.recvuntil(b"+OK ")
 			name = self.io.recvuntil(b"\r\n")
 			print(name[:-2].decode())
